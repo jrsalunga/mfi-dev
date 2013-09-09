@@ -1,0 +1,26 @@
+RewriteEngine on
+
+## http://monicalent.com/blog/2013/09/01/create-server-side-fallback-html5-push-state-backbone-js/
+#RewriteEngine On
+#RewriteBase /
+#RewriteRule ^index\.php$ - [L] 
+#RewriteCond %{REQUEST_FILENAME} !-f 
+#RewriteCond %{REQUEST_FILENAME} !-d 
+#RewriteRule ^(.*)$ index.php [L]
+
+
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_URI} !index
+#RewriteRule ^(.*) index.php [L]
+
+
+
+
+RewriteRule ^matcat(\/.*)*$ /masterfiles/matcat.php
+#RewriteRule ^dashboard(\/.*)*$ /index.php
+#RewriteRule ^login(\/.*)*$ /login.php
+#RewriteRule ^logout(\/.*)*$ /logout.php
+
+
+

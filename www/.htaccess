@@ -1,0 +1,17 @@
+RewriteEngine on
+
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteRule ^(.*)$ index.php?url=$1 [PT,L]
+#RewriteRule ^(.*)$ $1 [PT,L]
+
+
+
+
+RewriteRule ^index(\/.*)*$ /index.php
+RewriteRule ^dashboard(\/.*)*$ /index.php
+RewriteRule ^login(\/.*)*$ /login.php
+RewriteRule ^logout(\/.*)*$ /logout.php
+
+
+

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+ 
+<title>Untitled Document</title>
+
+<link rel="stylesheet" href="../css/global.css">
+
+<script src="../js/vendors/jquery-1.8.2.min.js"></script>
+<script src="../js/common.js"></script>
+
+<script>
+$(document).ready(function(e) {
+    
+	$("#submit").on('click', function(){
+		
+		var formData = $("#test").formToJSON();
+		var	aData;
+		
+		$("#log").html(formData);
+		
+		$.ajax({
+			type: 'POST',
+			contentType: 'application/json',
+			url: '../api/s/user',
+			dataType: "json",
+			async: false,
+			data: formData,
+			success: function(data, textStatus, jqXHR){
+				aData = data; 
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert(textStatus + 'Failed on getting '+ table +' header');
+			}
+		});
+		
+		
+		console.log(aData);
+		$("#log2").html(JSON.stringify(aData));
+			
+	});
+	
+	
+	
+	
+});
+</script>
+
+
+</head>
+
+<body>
+
+<form id="test" action="" method="post">
+	<input type="text" name="username" id="username"><br>
+    <input type="text" name="password" id="password"><br>
+    <input type="text" name="void" id="void"><br>
+    <button type="button" id="submit">Submit</button>
+    
+    <div id="log"></div>
+    <div id="log2"></div>
+</form>
+
+
+</body>
+</html>

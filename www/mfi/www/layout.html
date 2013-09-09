@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html lang="en-ph">
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+
+<link rel="stylesheet" href="css/global-ui.css">
+<script src="js/vendors/jquery-1.10.1.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(e) {
+    $('[data-state]').click(function(e) {
+	  state = $(this).attr('data-state');
+	  $('body') // or 'body'
+	 
+			  	.removeClass(
+					function(i, c) {	
+						var m = c.match(/state\d+/g);
+						if(m != null) {
+							return m.join(" ");
+						 } else {
+							return c;
+						}
+					})
+				.addClass('state-' + state);	
+	});
+});
+
+</script>
+
+</head>
+<body id="app-body" class="state-nav">
+	<div id="container">
+    	<header id="h">
+        	<div id="h-container">
+            	<div id="h-main">
+                	<div id="h-main-logo">
+                    	<img src="images/75x75.png">
+                        <div class="comp-name"></div>
+                    </div>
+                    <div id="h-main-user">
+                    	<div>
+							<a href="#">Jefferson Salunga</a>
+							<a class="logout" href="logout">Sign out</a>
+						</div>
+							<img src="images/silhouette36.png">
+                    </div>
+                </div>
+                <div id="h-foot">
+                	<div id="h-nav">
+                    	<div id="h-nav-container" class="blue"></div>
+                    </div>
+					<div id="h-subnav">
+                    	<div id="h-subnav-container" class="blue"></div>
+                    </div>
+                </div>
+            </div>
+    	</header>
+        <!--- main --->
+        <div id="main" role="main" class="animated">
+        	<div role="navigation" class="animated">Navigation</div>
+            <div role="sidebar" class="animated">Sidebar</div>
+        	<div role="content" class="animated">Content
+            <p><a data-state="nav" href="#">Switch to 'nav' state</a></p>
+	  		<p><a data-state="sidebar" href="#">Switch to 'sidebar' state</a></p>
+            </div>
+        </div>
+        <!--- end main ---> 
+    </div>
+</body>
+</html>

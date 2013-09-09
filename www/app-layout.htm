@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-ph"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+<title>Backbone Basic App Layout</title>
+
+
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/main-ui.css">
+<link rel="stylesheet" href="css/styles-ui.css">
+
+
+<script src="js/vendors/jquery-1.10.1.min.js"></script>
+<script src="js/vendors/jquery-1.9.1.js"></script>
+<!--
+<script src="js/vendors/underscore-min.js"></script>
+<script src="js/vendors/backbone-min.js"></script>
+-->
+<script src="http://underscorejs.org/underscore-min.js"></script>
+<script src="http://backbonejs.org/backbone-min.js"></script>
+<script src="js/vendors/bootstrap.min.js"></script>
+
+<script src="js/app-menu.js"></script>
+<script src="js/main-ui.js"></script>
+<script src="js/app-ui.js"></script>
+
+
+
+</head>
+<body id="app-body" class="state-nav">
+	<div id="container">
+		<header id="h">
+    		<div class="h-main-container">
+				<div id="h-main">
+					<div id="h-main-logo">
+					<img src="images/75x75.png">
+					<div class="comp-name"></div>
+				</div>
+				<div id="h-main-user">
+				<div>
+					<a href="#">Jefferson Salunga</a>
+					<a class="logout" href="http://localhost/prism2/logout">Sign out</a>
+				</div>
+					<img src="images/silhouette36.png">
+				</div>
+			</div>
+			<div style="clear: both; ">
+				<div id="h-nav">
+					<div id="h-nav-container"></div>
+				</div>
+				<div id="h-subnav">
+					<div id="h-subnav-container"></div>
+				</div>
+			</div>
+		</div>	
+	</header>
+	
+	<div role="main" class="animated" style="position:relative;">
+		<div>
+			<div role="navigation" class="animated" style="width:200px; position: absolute; top:0;">
+	  			<div id="nav-container">
+                	<nav class="main-nav">
+                    	<div class="nav active" id="menu0">
+							<div class="bb">
+								<div class="Sj"></div>
+								<div class="yb"></div>
+								<div class="kk">masterfiles</div>
+							</div>
+							<ul style="display: block;" class="fd">
+								<li>category</li>		
+								<li>items</li>		
+								<li>salesman</li>		
+								<li>supplier</li>
+								<li>customer</li>
+								<li>location</li>	
+							</ul>
+						</div>
+					    <div class="nav deactive" id="menu1">
+							<div class="bb">
+								<div class="Sj"></div>
+								<div class="yb"></div>
+								<div class="kk">transactions</div>
+							</div>
+							<ul style="display: none;" class="fd">
+								<li>accounts payable</li>
+								<li>check</li>
+								<li>invoice</li>
+							</ul>
+						</div>
+                        <div class="nav deactive" id="menu2">
+							<div class="bb">
+								<div class="Sj"></div>
+								<div class="yb"></div>
+								<div class="kk">reports</div>
+							</div>
+							<ul style="display: none;" class="fd">		
+							</ul>
+						</div>
+                        <div class="nav deactive" id="menu3">
+							<div class="bb">
+								<div class="Sj"></div>
+								<div class="yb"></div>
+								<div class="kk">utilities</div>
+							</div>
+							<ul style="display: none;" class="fd">	
+							</ul>
+						</div>
+               		</nav>
+            	</div>
+	  			<p><a data-state="initial" href="#">Close</a></p>
+	  		</div>
+            <!----- end role=navigation ------>
+	  	
+	  	
+	  	
+	  	<div role="content" class="animated" style="margin-left:200px; position:relative;">
+<!---------------------	   	------------------>
+            
+     	<div class="splitter" style="width:5px; height:100%; border-right: 1px solid #C8C8C8; cursor:w-resize; position:absolute; ">&nbsp;</div>    
+        <div class="stage" style="margin-left:5px;">
+        	<header>
+            	<div class="mod-name">
+                	<h1>Masterfiles Management</h1>
+                    <nav id="breadcrum">
+						<ul>
+							<li><a href="../index">Home</a></li>
+							<li><a href="../masterfiles/index">Masterfiles</a></li>
+							<li>Category</li>
+						</ul>
+                    </nav>
+                </div>
+            </header>
+        	<section>
+            	<div class="toolbar-container">
+                	<div class="toolbar">
+                    	<button id="tlbr-new" class="toolbar-minibutton" data-target="#mdl-frm-category" data-toggle="modal" type="button">New</button>
+                        <button id="tlbr-delete" class="toolbar-minibutton disabled" type="button" >Delete</button>
+                        <button id="tlbr-edit" class="toolbar-minibutton" data-target="#mdl-frm-category" data-toggle="modal" type="button">Edit</button>
+                    </div>
+                </div>
+                <div class="form-alert"></div>
+                <div class="form-container">
+                	
+                </div>
+                <div class="tb-data-container">
+                
+                </div>
+            </section>
+        </div>
+            
+      	
+            
+			
+<!--------------------- 	------------------>
+ 	  	</div>
+
+	</div>
+	</div>  
+	
+</div>
+
+
+
+
+
+<!---------------------  modals	------------------>
+<div id="mdl-frm-category" class="modal hide fade in" style="display: none;">
+            <div class="modal-header">
+              <a class="close" data-dismiss="modal">×</a>
+              <h3>New Category</h3>
+            </div>
+            <div class="modal-body">
+            <form id="frm-category2" name="frm-category2" class="table-model2" data-table="category" action="" method="post">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                	<tr>
+                    	<td><label>Code</label></td>
+                        <td><input type="text" maxlength="10" required></td>
+                    </tr>
+                    <tr>
+                    	<td><label>Descriptor</label></td>
+                        <td><input type="text"></td>
+                    </tr>
+                    <tr>
+                    	<td><label>Type</label></td>
+                        <td>
+                        	<select>
+                            	<option value="1">Product/Service</option>
+                                <option value="2">Expense</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+              </table>
+            </form>		        
+            </div>
+            <div class="modal-footer">
+              <button id="submit2" name="submit2" class="btn btn-success">Save</button>
+              <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+            </div>
+</div>
+
+
+
+</body></html>

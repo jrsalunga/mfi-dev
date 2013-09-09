@@ -1,0 +1,60 @@
+[
+        {
+            "name": "masterfiles",
+			"class": "active",
+            "sub": [
+                {
+                    "name": "category",
+					"class": "active"
+                },
+                {
+                    "name": "items",
+					"class": "deactive"
+                },
+                {
+                    "name": "salesman",
+					"class": "deactive"
+                },
+                {
+                    "name": "supplier",
+					"class": "deactive"
+                },
+                {
+                    "name": "customer",
+					"class": "deactive"
+                },
+                {
+                    "name": "location",
+					"class": "deactive"
+                }
+            ]
+        },
+        {
+            "name": "transactions",
+			"class": "deactive",
+            "sub": [
+                {
+                    "name": "accounts payable",
+					"class": "deactive"
+                },
+                {
+                    "name": "check",
+					"class": "deactive"
+                },
+                {
+                    "name": "invoice",
+					"class": "deactive"
+                }
+            ]
+        },
+        {
+            "name": "reports",
+			"class": "deactive",
+            "sub": []
+        },
+        {
+            "name": "utilities",
+			"class": "deactive",
+            "sub": []
+        }
+]
