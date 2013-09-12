@@ -118,12 +118,7 @@ $(document).ready(function(e) {
 			},
 		"aoColumns": [
 			//{   "sTitle": "<input type='checkbox' class='select-all'></input>","mDataProp": null, "sWidth": "20px", "sDefaultContent": "<input type='checkbox' ></input>", "bSortable": false},
-            { 	"mData": "code",  
-				"sTitle": "Code",
-				"mRender": function ( data, type, full ) {
-							return data+'<div class="tb-data-action"><a class="row-delete" href="#">delete</a><a class="row-edit" href="#">edit</a></div>';
-				}  
-			},
+            { "mData": "code",  "sTitle": "Code" },
             { "mData": "descriptor",  "sTitle": "Descriptor" }
 			],
 		"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
@@ -199,8 +194,8 @@ $(document).ready(function(e) {
             			<div class="kk">Masterfiles</div>
             		</div>
                     <ul class="fd">
-                        <li class="active"><a href="matcat">Materials Category</a></li>
-                    	<li><a href="itemcat">Items Category</a></li>
+                        <li><a href="matcat">Materials Category</a></li>
+                    	<li class="active"><a href="itemcat">Items Category</a></li>
                         <li><a href="/salesman">salesman</a></li>
                         <li><a href="/supplier">supplier</a></li>
                         <li><a href="customer">customer</a></li>
@@ -343,7 +338,6 @@ $(document).ready(function(e) {
                             	<td>&nbsp;</td>
                                 <td style="padding-top: 5px;">  		
                                   	<button type="button" id="frm-btn-save" class="btn btn-primary model-btn-save" disabled>Save</button>
-                                    <button type="button" id="frm-btn-save-blank" class="btn btn-primary model-btn-save-blank" disabled>Save &amp; Blank</button>
                                     <button type="button" id="frm-btn-delete" class="btn btn-primary model-btn-delete" disabled>Delete</button>
                                  	<button type="button" id="frm-btn-cancel" class="btn btn-default model-btn-cancel" disabled>Clear</button>
                                 </td>
@@ -408,7 +402,7 @@ $(document).ready(function(e) {
                     <tbody>
                         <tr>
                             <td><label for="code">Code:</label></td>
-                            <td><input type="text" name="code" id="code" maxlength="20" required></td>
+                            <td><input type="text" name="code" id="code" maxlength="20"></td>
                         </tr>
                         <tr>
                             <td><label for="descriptor">Descriptor:</label></td>
@@ -419,9 +413,9 @@ $(document).ready(function(e) {
             </form>
         </div>
         <div class="modal-footer">
-          <button type="button" id="modal-btn-cancel" class="btn btn-default model-btn-cancel" data-dismiss="modal" disabled>Cancel</button>
-          <button type="button" id="modal-btn-save" class="btn btn-primary model-btn-save" data-dismiss="modal" disabled>Save</button>
-          <button type="button" id="modal-btn-save-blank" class="btn btn-primary model-btn-save-blank" disabled>Save &amp; Blank</button>
+          <button type="button" id="mdl-btn-save" class="btn btn-default model-btn-cancel" data-dismiss="modal">Cancel</button>
+          <button type="button" id="mdl-btn-save" class="btn btn-primary model-btn-save">Save</button>
+          <button type="button" is="mdl-btn-save-blank" class="btn btn-primary model-btn-save-blank">Save &amp; Blank</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

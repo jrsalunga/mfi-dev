@@ -103,6 +103,26 @@
 				$("#nav-container").html(menusView.render().el);	
 			}
 		});
+
+
+	var ModalView = Backbone.View.extend({
+		el: ".modal",
+		initialize: function(){
+			
+		},
+		events: {
+			'click #mdl-btn-save': 'mdlSave'
+		},
+	    render: function() {
+	    	
+	        this.$('.modal').html(this.template(this.model.toJSON()));
+	        return this;
+    	},
+		mdlSave : function(){
+
+		}
+	})
+	
 	
 	
 	
@@ -113,8 +133,8 @@
 				"location": "showCategory"
 			},
 			index: function(){
-				
-				console.log("index");
+			
+				//console.log("index");
 			},
 			showCategory: function(){
 				
@@ -155,6 +175,8 @@
 				//console.log($("from").formToJSON());
 			}
 		});
+
+
 	
 	
 	
@@ -163,6 +185,7 @@
 	
 $(document).ready(function(e) {
 	
+
 	
 	
 	

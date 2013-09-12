@@ -382,6 +382,31 @@ button.minibutton[disabled]:hover {
     border-right: 1px solid #ccc;
 }
 
+.tb-data tbody tr td:first-of-type > div {
+    display:inline;
+    float:right; 
+    color: #ccc;
+    opacity:0;
+    font-size:11px;    
+}
+
+.tb-data tbody tr:hover td:first-of-type > div {
+	opacity:1;  
+}
+
+.tb-data tbody tr td:first-of-type > div > a {
+    color: #ccc;
+    padding:0 5px;
+    float:right;
+} 
+
+
+.tb-data tbody tr:hover td:first-of-type > div > a:hover {
+    color: #80808E;
+    text-decoration:none;
+}
+
+
 
 
 
@@ -411,7 +436,7 @@ button.minibutton[disabled]:hover {
 .dataTables_length select, .dataTables_filter input{
     height: auto;
     line-height: normal;
-    padding: 3px;
+    padding: 4px;
      margin:0;
 }
 

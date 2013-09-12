@@ -18,6 +18,7 @@ RewriteEngine on
 
 
 RewriteRule ^matcat(\/.*)*$ /masterfiles/matcat.php
+RewriteRule ^itemcat(\/.*)*$ /masterfiles/itemcat.php
 #RewriteRule ^dashboard(\/.*)*$ /index.php
 #RewriteRule ^login(\/.*)*$ /login.php
 #RewriteRule ^logout(\/.*)*$ /logout.php

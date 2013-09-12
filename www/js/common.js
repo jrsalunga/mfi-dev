@@ -1,3 +1,7 @@
+var root = location.protocol + '//' + location.host;
+var rootpath = root ;
+var apiPath = rootpath +'/api';
+
 $(document).ready(function() {
 	//ComputeItemAmount();
   	
@@ -13,6 +17,11 @@ $(document).ready(function() {
 		$(this).toDecimal();
 	}).on('blur', function(){
 		$(this).toNumberFormat();
+	});
+
+
+	$(".table-detail .currency").each(function(){
+		$(this).toNumberFormat();	
 	});
 	
 	
@@ -33,7 +42,39 @@ $(document).ready(function() {
 
 	
 	
-	
+	$.ajaxSetup({
+    beforeSend:function(){
+		/*
+		$.blockUI({ 
+	    	message: ' <h2>Loading <img src="../images/ajax-loader.gif"  /> </h2>',
+	    	css: {
+			    border: 'none', 
+			    padding: '15px', 
+			    backgroundColor: '#fff', 
+			    '-webkit-border-radius': '5px', 
+			    '-moz-border-radius': '5px',  
+				'border-radius': '5px',           
+			     color: '#bbb' 
+			}  
+		});
+		*/
+		
+		//$(".ajax-loading-overlay").show();
+		//$(".ajax-loading").show();
+    },
+    complete:function(){
+		
+		/*$.unblockUI({ 
+	    	message: ' <h2>Done</h2>',
+	        onUnblock: function(){ 
+				$('.blockMsg h2').html('Done');
+			} 
+		});*/
+       
+	  	$(".ajax-loading-overlay").hide();
+		$(".ajax-loading").hide();
+    	}
+	});
 	
 	
 	
@@ -53,7 +94,7 @@ $(document).ready(function() {
 	})
 	
 	
-	$('.tb-detail').live('click','a[href="#"]',function(e){
+	$('.tb-detail').on('click','a[href="#"]',function(e){
 		e.preventDefault();
 	});
 	
@@ -77,10 +118,10 @@ $(document).ready(function() {
 	
 	
 	
-	$('.table-model').on('click', '#frm-btn-save', function(){
+	//$('.table-model').on('click', '#frm-btn-save', function(){
 		//saveData();
-		$('#frm-alert').text($(".table-model").formToJSON());
-	});
+		//$('#frm-alert').text($(".table-model").formToJSON());
+	//});
 	
 	
 	$('#frm-btn-cancel').on('click',function(){
@@ -90,12 +131,9 @@ $(document).ready(function() {
 		renderImage(data);	
 	});
 	
-	
-	
-	
-	
-	
-	
+
+
+
 	/*
 	$('.tb-data > tbody > tr').each(function(){ 
 	    var id = $(this).data('id');
@@ -111,6 +149,7 @@ $(document).ready(function() {
 	
 	
 
+
 	
 	
 
@@ -120,17 +159,55 @@ $(document).ready(function() {
 
 
 
+function initToolbar() {
+	
+	//$("a.toolbar-minibutton.new").hide();
+	//$("a.print-preview").hide();
+	
+
+	/*
+	$("a.toolbar-minibutton.new").on("click", function(){
+		$(this).hide();
+		$(".table-model").clearForm();
+	});
+	*/
+	
+	var id = $(".table-model #id").val();
+	if(id == undefined || id == null || id == '') {
+		//console.log("id is undefine");
+		$("a.toolbar-minibutton.new").hide();
+		$("a.print-preview").hide();
+	} else {
+		$("a.toolbar-minibutton.new").show();
+		$("a.print-preview").show();
+	}
+	
+	$(".table-model #id").bind('DOMSubtreeModified', function() {
+   		//console.log("DOMSubtreeModified");
+		var id = $(".table-model #id").val();
+		if(id == undefined || id == null || id == '') {
+			$("a.toolbar-minibutton.new").hide();
+			$("a.print-preview").hide();
+		} else {
+			$("a.toolbar-minibutton.new").show();
+			$("a.print-preview").show();
+		}
+ 	});
+}
+
+
+
 
 
 function postingStatus(){
 	//console.log($(".table-model #posted").val());
 	
-	if($(".table-model #posted").val()==='1'){
-		var postingStatus = 'true';
+	if($(".table-model #posted").val()==='1' || $(".table-model #posted").val()===1){
+		var vpostingStatus = 'true';
 		//console.log(postingStatus);
 		return true;
 	} else {
-		var postingStatus = 'false';
+		var vpostingStatus = 'false';
 		//console.log(postingStatus);
 		return false;	
 	}
@@ -166,7 +243,7 @@ function deleteData(id,oTable) {
 		$.ajax({
         type: 'DELETE',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/'+ table +'/' + id,
+        url: apiPath +'/'+ table +'/' + id,
         dataType: "json",
        // data: id,
         success: function(data, textStatus, jqXHR){
@@ -222,7 +299,7 @@ function addData(oTable) {
     $.ajax({
         type: 'POST',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/s/'+ table ,
+		url: apiPath +'/'+ table ,
         dataType: "json",
         data: formData,
         success: function(data, textStatus, jqXHR){
@@ -286,9 +363,12 @@ function addTableData(data,oTable) {
 	  
 		var key, len = 0, row = '';
 		for(key in data) {
-			if(len == 0) {
+			if(len == 0 ) {
 				//row += '<tr id="'+ data[key] +'" data-id="'+ data[key] +'"><td>'+ ctr +'</td>';
 				row += '<tr id="'+ data[key] +'" data-id="'+ data[key] +'">';
+			} else if(key.substr(key.length - 2) === 'id' || key==='type'){
+				var opt = $(".table-model").find('#'+key+' option[value='+data[key]+']').text();
+				row += '<td>'+ opt +'</td>';
 			} else {	
 				row += '<td>'+ data[key] +'</td>';
 			}
@@ -369,7 +449,7 @@ function getData(id) {
     $.ajax({
         type: 'GET',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/'+ table +'/'+ id,
+        url: apiPath +'/'+ table +'/'+ id,
         dataType: "json",
         //data: id,
         success: function(data, textStatus, jqXHR){
@@ -385,11 +465,12 @@ function getData(id) {
 }
 
 function renderDetails(data) {
-	
+	//console.log(data);
 	var key;
 	for(key in data) {
 		//console.log(data[key]);
 		//console.log(key);
+
 		if(data[key]==null || data[key]==undefined) {
 
 		} else {
@@ -407,13 +488,14 @@ function renderDetails(data) {
 				});
 			
 			} else if($('#'+key).hasClass('currency')) {
-				//console.log($('#'+key));
+				//console.log(data[key]);
+				
 				$('#'+key).val(data[key]);
 				$('#'+key).toNumberFormat();
 
 			} else {
-					
-
+				
+				//$('#'+key).val(stripData);
 				$('#'+key).val(data[key]);
 				
 				if(key==='picfile') {
@@ -472,7 +554,7 @@ function updateData(id) {
     $.ajax({
         type: 'PUT',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/s/'+ table +'/' + id,
+        url: apiPath +'/s/'+ table +'/' + id,
         dataType: "json",
         data: formData,
         success: function(data, textStatus, jqXHR){
@@ -492,7 +574,12 @@ function updateTableData(data) {
 		var key, len = 0;
 		for(key in data) {
 			if(len == 0) {
-					
+
+			} else if(key === 'type'){
+
+					var opt = $(".table-model").find('#'+key+' option[value='+data[key]+']').text();
+					var i = len - 1;
+				$('td:eq('+ i +')', existing_tr).text(opt);
 			} else {	
 				//console.log($(existing_tr +' td').index());
 				//console.log(data[key]+' '+len);
@@ -596,14 +683,58 @@ $.fn.serializeObject = function()
 
     var a = this.serializeArray();
 
+
+    $.each(a, function() {
+    	
+    	//console.log(this.value);
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+
+        } else {
+            o[this.name] = this.value || '';
+      
+        }
+    });
+    return o;
+};
+
+// if value is blank, it does not include
+$.fn.serializeObject2 = function()
+{
+    var o = {};
+
+    //$('input[type=number]', this).each(function(){ // select all the element in form
+    $('input.currency', this).each(function(){ // select all the element in form
+    	$(this).toDecimal(); // convert the value to e.g.  10,012.05 to 10012.05
+    });                      // before sending to server
+
+
+    var a = this.serializeArray();
+
+
     $.each(a, function() {
         if (o[this.name] !== undefined) {
             if (!o[this.name].push) {
                 o[this.name] = [o[this.name]];
             }
             o[this.name].push(this.value || '');
+        } else if(this.value==""){
+        	// do nothing
         } else {
-            o[this.name] = this.value || '';
+
+        	if(this.name == "qty"){
+        		o[this.name] = parseInt(this.value) || 0;
+        	} else if(
+        		this.name == "unitcost" || 
+        		this.name == "amount"
+        		){
+        		o[this.name] = parseFloat(this.value) || 0;
+        	} else {
+        		o[this.name] = this.value || '';	
+        	}        
         }
     });
     return o;
@@ -778,12 +909,12 @@ function is_int(mixed_var){
 
 function S4() {
    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-};
+}
 
 // Generate a pseudo-GUID by concatenating random hexadecimal.
 function guid() {
    return (S4()+S4()+S4()+S4()+S4()+S4()+S4()+S4());
-};
+}
 
 /*
 
@@ -816,6 +947,15 @@ function guid(){
 */
 
 
+function toCurrency(data) {
+	var c = data;
+	var newValue = parseFloat(c);  // convert the value to integer
+	var converted = new NumberFormat(newValue).toFormatted();
+
+	return converted;
+}
+
+
 
 /**********************************************************************************************************************/
 /************************* flat table v2 stuff ****************************************************************************/
@@ -838,7 +978,7 @@ function addData2(oTable) {
     $.ajax({
         type: 'POST',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/t/'+ table ,
+		url: apiPath +'/t/'+ table ,
         dataType: "json",
         data: formData,
         success: function(data, textStatus, jqXHR){
@@ -873,7 +1013,7 @@ function getData2(id) {
     $.ajax({
         type: 'GET',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/t/'+ table +'/'+ id,
+        url: apiPath +'/t/'+ table +'/'+ id,
         dataType: "json",
         //data: id,
         success: function(data, textStatus, jqXHR){ 
@@ -896,7 +1036,7 @@ function updateData2(id) {
     $.ajax({
         type: 'PUT',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/t/'+ table +'/' + id,
+        url: apiPath +'/t/'+ table +'/' + id,
         dataType: "json",
         data: formData,
         success: function(data, textStatus, jqXHR){
@@ -983,7 +1123,7 @@ function deleteData2(id,oTable) {
 		$.ajax({
         type: 'DELETE',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/t/'+ table +'/' + id,
+        url: apiPath +'/t/'+ table +'/' + id,
         dataType: "json",
        // data: id,
         success: function(data, textStatus, jqXHR){
@@ -1008,7 +1148,7 @@ function deleteData2(id,oTable) {
 
 
 /**********************************************************************************************************************/
-/********************* table deatils stuff ****************************************************************************/
+/********************* table details stuff ****************************************************************************/
 /**********************************************************************************************************************/
 
 
@@ -1025,7 +1165,7 @@ function addToTableDetail(){
 	$.ajax({
         type: 'POST',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/detail/'+ table ,
+		url: apiPath +'/detail/'+ table ,
         dataType: "json",
         data: formData,
         success: function(data, textStatus, jqXHR) {
@@ -1034,11 +1174,9 @@ function addToTableDetail(){
         },
         error: function(jqXHR, textStatus, errorThrown){
             alert(textStatus + ': No Item found!');
+            
         }
     });
-	
-	
-
 }
 
 
@@ -1046,6 +1184,9 @@ function addToTableDetail(){
 function addDetailData(data) {
 	   
 	//clear_alert();
+	var detailid = null;
+
+	//console.log(data);
 	
 	if(!data.error) {
 		
@@ -1055,13 +1196,17 @@ function addDetailData(data) {
 		var key, len = 0, row = '';
 		for(key in data) {
 			if(len == 0) {
+				//console.log('len 0');
 				//row += '<tr data-id="'+ data[key] +'">';
 				var uuid = guid();
 				
 				row += '<tr id="'+ uuid +'" data-id="'+ uuid +'">';
 			} else if(len == 1) {
+				//console.log('len 1');
 				row += '<td data-'+ key +'="'+ data[key] +'" >';
+				detailid = data[key];
 			} else if(len == 2) {
+				//console.log('len 2');
 				row +=  data[key]  +'</td>';
 			} else {	
 				row += '<td data-'+ key +'="'+ data[key] +'" class="currency" >'+ data[key] +'</td>';
@@ -1074,6 +1219,7 @@ function addDetailData(data) {
 		row += '</tr>';	
 				
 	   	//lastRow.after(row);
+	   	//console.log(row);
 		$(row).appendTo(tb).find('td').each(function() {
 			if($(this).index()===0){ // find the first <td>
 				//console.log('first td');
@@ -1082,6 +1228,7 @@ function addDetailData(data) {
 					a += '<a href="#" data-id="'+ uuid +'" class="row-delete" >delete</a>'
 					//a += '<a href="#" data-id="fasdfas" data-toggle="modal" data-target="#mdl-frm-detail">edit</a>'
 					a += '<a href="#" data-id="'+ uuid +'" class="row-edit" >edit</a>'
+				//	a += '<a href="#" data-id="'+ detailid +'" class="row-view" >view</a>'
 					a += '</div>';
 				$(this).append(a);
 			}
@@ -1147,6 +1294,9 @@ function checkTotal() {
 	
 	checkTotalLine();
 
+	/*
+	* note: to auto compute amount make sure to change the id of span.total 
+	*/
 	$('span.total').each(function() {
 
 		var tb = $(".tb-detail tbody");
@@ -1188,10 +1338,12 @@ function checkTotal() {
 					var converted = new NumberFormat(sum).toFormatted();	// format the value to .00 from the class
 					//$("#tot"+field[2]).val(sum.toFixed(2));
 					$("#tot"+field[2]).val(converted);
+					//$("#"+field[2]).val(converted);
 					$(this).text(converted);
 					
 				} else {
 					$("#tot"+field[2]).val(sum);
+					//$("#"+field[2]).val(sum);
 					$(this).text(sum);
 
 				}
@@ -1205,7 +1357,7 @@ function checkTotal() {
 
 
 /*
-* covert the element text to float
+* covert the element text to floatto
 */
 $.fn.toCurrency = function(){
 	
@@ -1238,7 +1390,7 @@ $.fn.toDecimal = function(){
 		num.setCurrency(true);
 		num.setCurrencyPosition(num.LEFT_OUTSIDE);
 		num.setNegativeFormat(num.LEFT_DASH);
-		num.setNegativeRed(true);
+		num.setNegativeRed(false);
 		num.setSeparators(false, ',', ',');
 		val = num.toFormatted();
 		return this.val(val); // return the formatted value
@@ -1255,7 +1407,7 @@ $.fn.toNumberFormat = function(){
 		num.setCurrency(true);
 		num.setCurrencyPosition(num.LEFT_OUTSIDE);
 		num.setNegativeFormat(num.LEFT_DASH);
-		num.setNegativeRed(true);
+		num.setNegativeRed(false);
 		num.setSeparators(true, ',', ',');
 		val = num.toFormatted();
 
@@ -1315,6 +1467,18 @@ $.fn.renderDetailsToForm = function(data){
 }
 
 
+function stripHTML(x) {
+
+	if(x!=null) {
+		var regex = /(<([^>]+)>)/ig; 
+		return newVal = x.replace(regex, "");
+	} else {
+		return false;
+	}
+	
+}
+
+
 
 /*
 * function to update the selected row detail 
@@ -1328,7 +1492,7 @@ function updateToTableDetail(){
 
 		for(key in data) {
 
-			var td = $('td:eq('+ len +')', existing_tr);
+			var stripData = stripHTML(data[key]);
 
 			if(len == 0) {
 
@@ -1336,8 +1500,10 @@ function updateToTableDetail(){
 				
 			} else {		
 				var i = len - 1;
-				$('td:eq('+ i +')', existing_tr).text(data[key]);
-				$('td:eq('+ i +')', existing_tr).attr('data-'+key, data[key]);
+
+
+				$('td:eq('+ i +')', existing_tr).text(stripData);
+				$('td:eq('+ i +')', existing_tr).attr('data-'+key, stripData);
 			}
 			len++;		
 		}
@@ -1483,7 +1649,7 @@ function postDetail(){
 	$.ajax({
         type: 'POST',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/post/detail/'+ table ,
+		url: apiPath +'/post/detail/'+ table ,
         dataType: "json",
         async: false,
         data: formData,
@@ -1511,7 +1677,7 @@ function addParent() {
 	$.ajax({
         type: 'POST',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/t/'+ table ,
+		url: apiPath +'/t/'+ table ,
         dataType: "json",
         async: false,
         data: formData,
@@ -1574,17 +1740,19 @@ function addParentChild() {
 function putDetail(){
 	
 	var form = $(".table-detail");
+	var formModel = $(".table-model");
 	var formData = form.HTMLTableToJSON();
 	var table = form.data("table");
-	var apvhdrid = $(".tb-detail").data("apvhdrid");
 	var table2 = $(".table-model").data("table");
+	var id = $(".tb-detail").data(table2+'id');
+	
 	var aData;
 
 	
 	$.ajax({
         type: 'PUT',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/post/detail/'+ table +'/'+ table2 +'/' + apvhdrid,
+		url: apiPath +'/post/detail/'+ table +'/'+ table2 +'/' + id ,
         dataType: "json",
         async: false,
         data: formData,
@@ -1613,7 +1781,7 @@ function updateParent(id) {
 	$.ajax({
         type: 'PUT',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/t/'+ table +'/'+ id ,
+		url: apiPath +'/t/'+ table +'/'+ id ,
         dataType: "json",
         async: false,
         data: formData,
@@ -1638,6 +1806,7 @@ function updateParentChild(id) {
     var	table = form.data('table');	
     var parent_respone = updateParent(id);
 
+    console.log(parent_respone);
 
     if(!parent_respone.error) {
 
@@ -1648,6 +1817,8 @@ function updateParentChild(id) {
     	$(".tb-detail").attr('data-'+table+'id',parent_respone.id);
 
     	var childRespone = putDetail();
+
+
 
     	if(!childRespone.error) {
     		set_alert('success','Well done!', 'You successfully saved');
@@ -1680,7 +1851,7 @@ function deleteParent(id) {
 	$.ajax({
         type: 'DELETE',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/t/'+ table +'/'+ id ,
+		url: apiPath +'/t/'+ table +'/'+ id ,
         dataType: "json",
         async: false,
         //data: formData,
@@ -1704,9 +1875,30 @@ function deleteParentChild(id) {
 
     var form = $(".table-model");	
     var	table = form.data('table');	
+
+    $.blockUI({ 
+    	message: ' <h2>Deleting <img src="../../../images/ajax-loader.gif"  /> </h2>',
+    	css: {
+		    border: 'none', 
+		    padding: '15px', 
+		    backgroundColor: '#fff', 
+		    '-webkit-border-radius': '5px', 
+		    '-moz-border-radius': '5px',  
+			'border-radius': '5px',           
+		     color: '#bbb' 
+		}  
+	});
+
     var parent_respone = deleteParent(id);
 
-    console.log(parent_respone);
+    $.unblockUI({ 
+    	message: ' <h2>Done</h2>',
+        onUnblock: function(){ 
+			$('.blockMsg h2').html('Done');
+		} 
+	}); 
+
+    //console.log(parent_respone);
 
     if(!parent_respone.error) {
     	set_alert('success','Well done!', 'You successfully deleted APV header');
@@ -1714,17 +1906,33 @@ function deleteParentChild(id) {
     	set_alert('error','Oh snap!', 'Unable to delete APV header');
     }
 
-    window.history.go(-1);
+    
 
 }
 
 
-
-
+/*
+*    new submitdetail handler for saving form data (.table-model)
+*/
 function saveTableModel(){
 	var id = $(".table-model #id").val();
 	var role = $(".table-model").data("role");
 	var respone;
+
+	
+	$.blockUI({ 
+    	message: ' <h2>Saving <img src="../../../images/ajax-loader.gif"  /> </h2>',
+    	css: {
+		    border: 'none', 
+		    padding: '15px', 
+		    backgroundColor: '#fff', 
+		    '-webkit-border-radius': '5px', 
+		    '-moz-border-radius': '5px',  
+			'border-radius': '5px',           
+		     color: '#bbb' 
+		}  
+	});
+
 
 	if(role==='parent') {
 		//console.log('parent role');
@@ -1748,6 +1956,15 @@ function saveTableModel(){
 		renderDetails(respone);	
 	}
 
+
+	 $.unblockUI({ 
+    	message: ' <h2>Done</h2>',
+        onUnblock: function(){ 
+			$('.blockMsg h2').html('Done');
+		} 
+	});
+
+	/*
 	if(!respone.error) {
     	set_alert('success','Well done!', 'You successfully saved');
 
@@ -1756,7 +1973,7 @@ function saveTableModel(){
     } else {
     	set_alert('error','Oh snap!', respone.error);
     }
-
+	*/
 
 
 }
@@ -1774,7 +1991,7 @@ function addData3(){
     $.ajax({
         type: 'POST',
         contentType: 'application/json',
-		url: 'http://localhost/prism/www/api/s/'+ table ,
+		url: apiPath +'/s/'+ table ,
         dataType: "json",
         async: false,
         data: formData,
@@ -1801,7 +2018,7 @@ function updateData3(id) {
     $.ajax({
         type: 'PUT',
         contentType: 'application/json',
-        url: 'http://localhost/prism/www/api/s/'+ table +'/'+ id,
+        url: apiPath +'/s/'+ table +'/'+ id,
         dataType: "json",
         async: false,
         data: formData,
@@ -1814,6 +2031,36 @@ function updateData3(id) {
     });
 
     return aData;
+}
+
+
+function postCancelledTable(id){
+	var form = $(".table-model");
+	var formData = form.formToJSON();	
+    var	table = form.data('table');	
+	var aData; 
+
+	$.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+		url: apiPath +'/txn/post/'+ table +'/'+ id +'/cancelled',
+        dataType: "json",
+        async: false,
+        //data: formData,
+        success: function(data, textStatus, jqXHR){
+            aData = data;
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+            alert(textStatus + ' Failed on posting data');
+        }
+    });	
+	
+	$(".table-model .currency").each(function(){
+		$(this).toNumberFormat();	
+	});
+
+
+	return aData;		 
 }
 
 
