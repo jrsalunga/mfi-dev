@@ -89,7 +89,7 @@
 
 	</div>
 	</div>  
-	<div role="presentation" class="padded animated">
+	<div role="presentations" class="padded animated">
 	  	<h3>Presentation</h3>
 	  	<p>This is the presentation content.</p>
 	  	<p><a data-state="initial" href="#">Switch to 'Initial' state</a></p>

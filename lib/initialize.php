@@ -12,7 +12,7 @@ defined('ROOT') ? null : define('ROOT', dirname(dirname(__FILE__)));
 defined('TEMPLATE_PATH') ? null : define('TEMPLATE_PATH',ROOT.DS.'templates');
 
 defined('DEVELOPMENT_ENVIRONMENT') ? null : define('DEVELOPMENT_ENVIRONMENT', true);
-defined('SERVER_LIVE') ? null : define('SERVER_LIVE', false);
+defined('SERVER_LIVE') ? null : define('SERVER_LIVE', true);
 
 
 /** Check if environment is development and display errors **/
@@ -55,6 +55,29 @@ require_once(ROOT.DS.'classes'.DS.'functions.php');
 
 require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.user.php');
 require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.matcat.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.itemcat.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.material.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.item.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.bank.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.supplier.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.apvhdr.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.apvdtl.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.ledger.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.apledger.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.apvledger.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.cvhdr.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.cvapvdtl.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.cvchkdtl.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.account.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.acctcat.php');
+
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.view.material.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.view.item.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.view.apvhdr.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.view.cvhdr.php');
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.view.account.php');
+
+require_once(ROOT.DS.'classes'.DS.'model'.DS.'class.v.supplier.php');
 
 
 

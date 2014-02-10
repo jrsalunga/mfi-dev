@@ -1,13 +1,12 @@
 <?php
 include_once('../../lib/initialize.php');
 
-$matcat = new Matcat;
+#$apvhdr = Apvhdr::getLastNumber();
 
-$matcat->code = '001';
-$matcat->descriptor = 'this is a test';
-$matcat->save();
 
-//echo var_export($matcat);
+#echo var_export($apvhdr);
 
+$refno = 1;
+echo str_pad($refno, 10, "0", STR_PAD_LEFT);
 
 ?>

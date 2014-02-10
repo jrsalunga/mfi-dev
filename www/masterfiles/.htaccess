@@ -19,6 +19,12 @@ RewriteEngine on
 
 RewriteRule ^matcat(\/.*)*$ /masterfiles/matcat.php
 RewriteRule ^itemcat(\/.*)*$ /masterfiles/itemcat.php
+RewriteRule ^account(\/.*)*$ /masterfiles/account.php
+RewriteRule ^acctcat(\/.*)*$ /masterfiles/acctcat.php
+RewriteRule ^item(\/.*)*$ /masterfiles/item.php
+RewriteRule ^material(\/.*)*$ /masterfiles/material.php
+RewriteRule ^bank(\/.*)*$ /masterfiles/bank.php
+RewriteRule ^supplier(\/.*)*$ /masterfiles/supplier.php
 #RewriteRule ^dashboard(\/.*)*$ /index.php
 #RewriteRule ^login(\/.*)*$ /login.php
 #RewriteRule ^logout(\/.*)*$ /logout.php

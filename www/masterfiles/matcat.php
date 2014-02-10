@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-<title>Modularfusion Inc - Materials Category</title>
-
+<title>Modularfusion Inc - Material Category</title>
+<link rel="shortcut icon" type="image/x-icon" href="../images/mfi-logo.jpg" />
 
 <link rel="stylesheet" href="../css/bootstrap.css">
 <link rel="stylesheet" href="../css/styles-ui.css">
@@ -40,20 +40,35 @@
 
 
 <script type="text/template" id="modal-matcat-tpl">
-	<form id="frm-matcat" name="frm-matcat" class="table-model" data-table="matcat" action="" method="post">	
-   		<table cellpadding="0" cellspacing="0" border="0">
+	<form id="frm-mdl-matcat" name="frm-mdl-matcat" class="table-model" data-table="matcat" action="" method="post">	
+    	<table cellpadding="5px" cellspacing="0" border="0">
         	<tbody>
             	<tr>
-                	<td><label for="code">Code:</label></td>
-                    <td><input type="text" name="code" id="code" maxlength="20"></td>
-               	</tr>
+                	<td><label for="code">Code: </label></td>
+                    <td><input type="text" name="code" id="code" maxlength="20" value="<%= code %>" required></td>
+            	</tr>
                 <tr>
                 	<td><label for="descriptor">Descriptor:</label></td>
-                    <td><input type="text" name="descriptor" id="descriptor" maxlength="50" class="m-input"></td>
-              	</tr>
-         	</tbody>
-      	</table>
-	</form>	
+                    <td><input type="text" name="descriptor" id="descriptor" maxlength="50" class="m-input" value="<%= descriptor %>"></td>
+         		</tr>
+        	</tbody>
+    	</table>
+ 	</form>
+</script>
+
+<script type="text/template" id="modal-matcat-readonly-tpl">
+	<table cellpadding="5px" cellspacing="0" border="0">
+	<tbody>
+		<tr>
+			<td>Code:</td>
+			<td><strong><%= code %></strong></td>
+		</tr>
+		<tr>
+			<td>Descriptor:</td>
+			<td><strong><%= descriptor %></strong></td>
+		</tr>
+		</tbody>
+	</table>
 </script>
 
 
@@ -82,8 +97,21 @@ var oTable;
 $(document).ready(function(e) {
 	
 	var appRouter = new Router();
-	
 	var appView = new AppView({model: app});
+	
+	var matcatModalView = new MatcatModal({ model: matcat});
+	matcatModalView.render();
+	var matcatDataGridView = new DataGridView({model: matcat});
+
+	$('#tlbr-new').on('click', function(){
+		//$(".modal .modal-title").text('Add');
+		matcatModalView.modalTitle.text('Add Record');
+		matcatModalView.clearForm();
+		    btn = '<button type="button" id="modal-btn-save" class="btn btn-primary model-btn-save" data-dismiss="modal" disabled>Save</button>';
+        btn += '<button type="button" id="modal-btn-save-blank" class="btn btn-primary model-btn-save-blank" disabled>Save &amp; Blank</button>';
+        btn += '<button type="button" id="modal-btn-cancel" class="btn btn-default model-btn-cancel" data-dismiss="modal">Cancel</button>';
+        $('.modal-footer').html(btn);  
+	});
 	
 	
 	//appView.loadMenus();
@@ -118,29 +146,19 @@ $(document).ready(function(e) {
 			},
 		"aoColumns": [
 			//{   "sTitle": "<input type='checkbox' class='select-all'></input>","mDataProp": null, "sWidth": "20px", "sDefaultContent": "<input type='checkbox' ></input>", "bSortable": false},
-            { 	"mData": "code",  
-				"sTitle": "Code",
+            { "mData": "code",  "sTitle": "Code",
 				"mRender": function ( data, type, full ) {
-							return data+'<div class="tb-data-action"><a class="row-delete" href="#">delete</a><a class="row-edit" href="#">edit</a></div>';
-				}  
+							return data+'<div class="tb-data-action"><a class="row-delete" href="#">&nbsp;</a><a class="row-edit" href="#">&nbsp;</a></div>';
+				}
 			},
             { "mData": "descriptor",  "sTitle": "Descriptor" }
 			],
 		"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 
-	            $(nRow).attr("data-id", aData.id);
-				$(nRow).attr("id", aData.id);
-				 
-				//console.log(aData.type);
-				/*
-				if ( aData.type == 1 ) {
-		        	$('td:eq(2)', nRow).html( 'Product/Service' );
-		        } else {
-					$('td:eq(2)', nRow).html( 'Expense' );
-				}
-	            return nRow;
-				*/
-        	}
+      $(nRow).attr("data-id", aData.id);
+			$(nRow).attr("id", aData.id);
+	
+      }
     });
 	
 	
@@ -148,9 +166,16 @@ $(document).ready(function(e) {
 	
 	
 	
-	$("#tlbr-new").on('click', function(){
-			$("#mdl-frm-category .modal-title").text('Add Materials Category');
+	$("#tlbr-refresh-datatable").on('click', function(){
+			oTable.fnDraw();
 	});
+	$("#tlbr-refresh-datatable2").on('click', function(){
+			oTable.fnDraw();
+	});
+	$(".tlbr-refresh").on('click', function(){
+			oTable.fnDraw();
+	});
+	
 	
 	
 });
@@ -200,23 +225,23 @@ $(document).ready(function(e) {
             		</div>
                     <ul class="fd">
                         <li class="active"><a href="matcat">Materials Category</a></li>
-                    	<li><a href="itemcat">Items Category</a></li>
-                        <li><a href="/salesman">salesman</a></li>
-                        <li><a href="/supplier">supplier</a></li>
-                        <li><a href="customer">customer</a></li>
-                        <li><a href="location">location</a></li>
+                        <li><a href="material">Material</a></li>
+                    	  <li><a href="acctcat">Accounts Category</a></li>
+                        <li><a href="account">Account</a></li>
+                        <li><a href="supplier">Supplier</a></li>
+                        <li><a href="bank">Bank</a></li>
                     </ul>
             	</div>
                 <div id="menu1" class="nav deactive">
                		<div class="bb">
                         <div class="Sj"></div>
                         <div class="yb"></div>
-                        <div class="kk">transactions</div>
+                        <div class="kk">Transactions</div>
                		</div>
                     <ul class="fd">
-                   		<li><a href="accounts payable.php">accounts payable</a></li>
-                        <li><a href="check.php">check</a></li>
-                        <li><a href="invoice.php">invoice</a></li>
+                   		<li><a href="../transactions/apvhdr">Accounts Payable</a></li>
+                        <li><a href="../masterfiles/check.php">check</a></li>
+                        <li><a href="../masterfiles/invoice.php">invoice</a></li>
                     </ul>
                 </div>
                 <div id="menu2" class="nav deactive">
@@ -307,7 +332,13 @@ $(document).ready(function(e) {
                 -->
             	<div class="toolbar-container">
                 	<div class="toolbar">
-                    	<button id="tlbr-new" class="toolbar-minibutton" data-target="#mdl-frm-matcat" data-toggle="modal" type="button">New</button>
+                    	<!--
+                    	<button id="tlbr-new" class="toolbar-minibutton" data-target="#mdl-frm-itemcat" data-toggle="modal" type="button" title="Create New Record">New</button>
+                        <button id="tlbr-refresh-datatable" class="toolbar-minibutton" type="button" title="Refresh Datatable">Refresh</button>
+                        -->
+                        <button id="tlbr-new" class="toolbar-minibutton" data-target="#mdl-frm-itemcat" data-toggle="modal" type="button" title="Create New Record"><div class="tlbr-new">&nbsp;</div></button>
+                        <button id="tlbr-refresh-datatable" class="toolbar-minibutton" type="button" title="Refresh Datatable"><div class="tlbr-refresh">&nbsp;</div></button>
+                        
                         <!--
                         <button id="tlbr-delete" class="toolbar-minibutton disabled" type="button" >Delete</button>
                         <button id="tlbr-edit" class="toolbar-minibutton" data-target="#mdl-frm-category" data-toggle="modal" type="button">Edit</button>
@@ -315,9 +346,10 @@ $(document).ready(function(e) {
                     </div>
                 </div>
                 <div class="form-alert"></div>
-                <div class="form-container">
+                
                 <!-------------- from-container ---------------------------->
                 <!--
+                <div class="form-container">
                 <div class="row">
   					<div class="col-xs-6 col-sm-4 col-md-4" style="background-color:#666699;">col-xs-6 .col-sm-4 .col-md-4</div>
   					<div class="col-xs-6 col-sm-4 col-md-4" style="background-color:#FF9;">.col-xs-6 .col-sm-4 .col-md-4</div>
@@ -326,9 +358,9 @@ $(document).ready(function(e) {
   					<div class="col-sm-4 col-md-4" style="background-color:#F1C40F;">col-md-4</div>
   					<div class="col-sm-4 col-md-4" style="background-color:#F39C12;">col-md-4</div>
 				</div>
-                -->
+                
                 <div id="frm-alert"></div>
-               	<form id="frm-matcat" name="frm-matcat" class="table-model" data-table="matcat" action="" method="post">	
+               	<form id="frm-itemcat" name="frm-itemcat" class="table-model" data-table="itemcat" action="" method="post">	
                 	<table cellpadding="0" cellspacing="0" border="0">
                     	<tbody>
                         	<tr>
@@ -343,7 +375,6 @@ $(document).ready(function(e) {
                             	<td>&nbsp;</td>
                                 <td style="padding-top: 5px;">  		
                                   	<button type="button" id="frm-btn-save" class="btn btn-primary model-btn-save" disabled>Save</button>
-                                    <button type="button" id="frm-btn-save-blank" class="btn btn-primary model-btn-save-blank" disabled>Save &amp; Blank</button>
                                     <button type="button" id="frm-btn-delete" class="btn btn-primary model-btn-delete" disabled>Delete</button>
                                  	<button type="button" id="frm-btn-cancel" class="btn btn-default model-btn-cancel" disabled>Clear</button>
                                 </td>
@@ -351,9 +382,10 @@ $(document).ready(function(e) {
                         </tbody>
                     </table>
                 </form>
-                	
-                <!-------------- end from-container ---------------------------->	
                 </div>
+                <!-------------- end from-container ---------------------------->	
+                
+                
                 <div class="tb-data-container">
                 	<table class="tb-data" cellpadding="0" cellspacing="0" width="100%">
 		                       <!-- <thead>
@@ -387,7 +419,7 @@ $(document).ready(function(e) {
 
 	</div>
 	</div>  
-	<div role="presentation" class="padded animated">
+	<div role="presentations" class="padded animated">
 	  	<h3>Presentation</h3>
 	  	<p>This is the presentation content.</p>
 	  	<p><a data-state="initial" href="#">Switch to 'Initial' state</a></p>
@@ -395,7 +427,7 @@ $(document).ready(function(e) {
 </div>
 
 
- <div class="modal fade" id="mdl-frm-matcat" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal fade" id="mdl-frm-itemcat" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -403,25 +435,14 @@ $(document).ready(function(e) {
           <h4 class="modal-title"></h4>
         </div>
         <div class="modal-body">
-			<form id="frm-mdl-matcat" name="frm-mdl-matcat" class="table-model" data-table="matcat" action="" method="post">	
-                <table cellpadding="0" cellspacing="0" border="0">
-                    <tbody>
-                        <tr>
-                            <td><label for="code">Code:</label></td>
-                            <td><input type="text" name="code" id="code" maxlength="20" required></td>
-                        </tr>
-                        <tr>
-                            <td><label for="descriptor">Descriptor:</label></td>
-                            <td><input type="text" name="descriptor" id="descriptor" maxlength="50" class="m-input"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
+			
         </div>
         <div class="modal-footer">
-          <button type="button" id="modal-btn-cancel" class="btn btn-default model-btn-cancel" data-dismiss="modal" disabled>Cancel</button>
-          <button type="button" id="modal-btn-save" class="btn btn-primary model-btn-save" data-dismiss="modal" disabled>Save</button>
-          <button type="button" id="modal-btn-save-blank" class="btn btn-primary model-btn-save-blank" disabled>Save &amp; Blank</button>
+          <!--
+          <button type="button" id="mdl-btn-save" class="btn btn-primary model-btn-save" data-dismiss="modal" disabled>Save</button>
+          <button type="button" is="mdl-btn-save-blank" class="btn btn-primary model-btn-save-blank" disabled>Save &amp; Blank</button>
+          <button type="button" id="mdl-btn-save" class="btn btn-default model-btn-cancel" data-dismiss="modal" disabled>Cancel</button>
+        	-->
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

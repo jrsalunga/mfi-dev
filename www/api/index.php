@@ -70,9 +70,9 @@ $app->post('/AuthUserLogin',  'authUserLogin');
 
 
 
-// return a view of table data
+// return a view of table data from a view table
 $app->get('/t/:table', 'getTables');
-$app->get('/t/:table/:id',  'getTable');
+$app->get('/t/:table/:id',  'getTable2');
 $app->post('/t/:table', 'addTable');
 $app->put('/t/:table/:id',  'updateTable');
 $app->delete('/t/:table/:id',  'deleteTable');
@@ -85,6 +85,13 @@ $app->post('/s/:table', 'addRealTable');
 $app->put('/s/:table/:id',  'updateRealTable');
 $app->delete('/s/:table/:id',  'deleteRealTable');
 
+//return a view table data but dont have a view table
+$app->get('/v/:table', 'getRealTables');
+$app->get('/v/:table/:id',  'getRealTable');
+$app->post('/v/:table', 'addRealTable2');
+$app->put('/v/:table/:id',  'updateRealTable');
+$app->delete('/v/:table/:id',  'deleteRealTable');
+
 
 
 
@@ -92,19 +99,85 @@ $app->get('/datatables/:table',  'datatables');
 $app->get('/datatables/v/:table',  'datatables2');
 
 $app->get('/search/:table', 'searchTable');
+$app->get('/search/txn/v/:table/:supplierid', 'searchTxnViewTable');
+
 
 $app->post('/detail/:table', 'getDetail'); // get the item to put in html table
 $app->post('/post/detail/:table', 'postDetail');
-$app->put('/post/detail/:table/:table2/:apvhdrid', 'putDetpostDetailail');
+$app->put('/post/detail/:table/:table2/:apvhdrid', 'putDetail');
 
 
 // posting
 $app->post('/txn/post/apvhdr/:id', 'postingApvhdr');
+$app->get('/txn/posting/apvhdr/:id', 'postingApvhdr');
 $app->post('/txn/post/apvhdr/:id/cancelled', 'postingCancelledApvhdr');
+
+$app->get('/posted/detail/:table/:fld', 'getPostedDetail');
+
+$app->get('/txn/:child/:parent/:id', 'getChildTable');
+$app->get('/txn/delete/:child/:parent/:id', 'deleteChildTable');
+$app->delete('/txn/:child/:parent/:id', 'deleteChildTable');  
+
+
 
 
  /*****************************  Run App **************************/
 $app->run();
+
+function getChildTable($child, $parent, $id){
+
+    $cTable = ucfirst($child);
+
+    $oTable = $cTable::find_all_by_field_id($parent, $id);
+
+    echo json_encode($oTable);
+}
+
+
+// delete all details with apvhdrid on Apvdtls Table
+function deleteChildTable($child, $parent, $id){
+
+    //$app = \Slim\Slim::getInstance();
+    $database = MySQLDatabase::getInstance();
+    $sTable = ucfirst($child); // apvdtl
+    $sTable2 = ucfirst($parent); // apvhdr
+
+    //$request = $app->request()->getBody();
+    //$detail = json_decode($request, true);
+
+
+    //check 1st if there is an existing table2 (parent table)
+    //2nd if there is a record with that id
+    $par = $sTable2::find_by_id($id);
+
+    if(isset($par) && $par!=false) {
+        
+        if(!$sTable::delete_all_by_field_id($parent,$id)){
+            
+            $respone = array(
+                'status' => 'error', 
+                'code' => '400',
+                'message' => 'details not deleted saved'
+            );
+        } else {
+            $respone = array(
+                'status' => 'ok', 
+                'code' => '200',
+                'message' => 'detail deleted'
+            );
+        }
+    } else {
+        $respone = array(
+            'status' => 'error', 
+            'code' => '404',
+            'message' => 'the is no '. $parent .' table found'
+        );
+    }
+    echo json_encode($respone);    
+}
+
+
+
 
 
 function getTables($table) {
@@ -124,6 +197,25 @@ function getTables($table) {
     }
 }
 
+function getTables2($table) {
+
+    $sTable = ucfirst($table);
+    
+    $vTable = substr_replace($sTable, 'v', 0, 0);
+    $ovTables = $vTable::find_by_all();
+          
+
+    if($ovTable){
+        echo json_encode($ovTables);
+    } else {
+        $respone = array(
+                "status" => "error",
+                "message" => "Record(s) not found!"
+        );
+        echo json_encode($respone);
+    }
+}
+
 
 function getTable($table, $id) {
 
@@ -133,6 +225,26 @@ function getTable($table, $id) {
 
     if($oTable){
         echo json_encode($oTable);
+    } else {
+        $respone = array(
+                "status" => "error",
+                "message" => "Record not found!"
+        );
+        echo json_encode($respone);
+    }
+    
+}
+
+function getTable2($table, $id) {
+
+    $sTable = ucfirst($table);
+    
+    $vTable = substr_replace($sTable, 'v', 0, 0);
+
+    $ovTable = $vTable::find_by_id($id);
+
+    if($ovTable){
+        echo json_encode($ovTable);
     } else {
         $respone = array(
                 "status" => "error",
@@ -175,7 +287,12 @@ function addTable($table) {
         echo json_encode($ovTable);    
 
     } else {
-       echo '{"error":" error on saving '.mysql_error().'"}';
+       $respone = array(
+            'status' => 'error', 
+            'code' => '404',
+            'message' => 'error on saving '.mysql_error()
+        );
+       echo json_encode($respone);
     }
 
     /*
@@ -225,12 +342,20 @@ function updateTable($table, $id) {
     } else {
 
         if(mysql_error()){
-            echo '{"error":" error on saving. '.mysql_error().'"}';
+            $respone = array(
+                'status' => 'error', 
+                'code' => '404',
+                'message' => 'error on saving '.mysql_error()
+            );
         } else {
-            echo '{"error":" error on saving. No changes have been made" }';   
+            $respone = array(
+                'status' => 'error', 
+                'code' => '504',
+                'message' => 'error on saving. No changes have been made'
+            );   
         }
         
-        #echo json_encode($success); 
+        echo json_encode($respone); 
     }    
 
 }
@@ -330,12 +455,19 @@ function addRealTable($table) {
         echo json_encode($oTable);    
 
     } else {
-       echo '{"error":" error on saving '.mysql_error().'"}';
+
+        $respone = array(
+            'status' => 'error', 
+            'code' => '404',
+            'message' => 'error on saving '.mysql_error()
+        );
+       echo json_encode($respone);
     }
     
 }
 
 function updateRealTable($table, $id) {
+    global $database;
 
     $app = \Slim\Slim::getInstance();
     $sTable = ucfirst($table);
@@ -361,11 +493,17 @@ function updateRealTable($table, $id) {
 
     #$oTable->id = $id;
 
+    if($oTable::find_by_id($id)){
+        $success = false;
+        $success = $oTable->save();
+    } else {
+        $success = false;
+        $success = $oTable->create();
+    }
 
-    $success = false;
-    $success = $oTable->save();
+    
        
-
+    //echo $database->last_query;
     if($success) {
     
 
@@ -373,12 +511,27 @@ function updateRealTable($table, $id) {
 
     } else {
         if(mysql_error()){
-            echo '{"error":" error on saving '.mysql_error().'"}';
+            //echo '{"error":" error on saving '.mysql_error().'"}';
+
+            $respone = array(
+                'status' => 'error', 
+                'code' => '404',
+                'message' => 'error on saving '.mysql_error()
+            );
+            echo json_encode($respone);
         #echo json_encode($success); 
         } else {
-            echo '{"warning":" Nothing to update"}';
+            //echo '{"warning":" Nothing to update"}';
             #echo json_encode($success); 
+
+            $respone = array(
+                'status' => 'warning', 
+                'code' => '504',
+                'message' => 'Nothing to update '.mysql_error()
+            );
+            echo json_encode($respone);
         }
+
         
     }    
 
@@ -412,145 +565,51 @@ function deleteRealTable($table, $id) {
 
 
 
-/**
-* Category table
-*/
-function getCategories() {
+function addRealTable2($table) {
 
     $app = \Slim\Slim::getInstance();
-    $app->response()->header("Content-Type", "application/json");
-    
-    $category = Category::find_all();
-    echo json_encode($category);
-}
-
- 
-function getCategory($id) {
-    $category = Category::find_by_id($id);
-     unset($category->type_name);
-    echo json_encode($category);
-}
-
-function saveCategory($id) {
-
-    $app = \Slim\Slim::getInstance();
-    $database = MySQLDatabase::getInstance();
+    $sTable = ucfirst($table);
 
     $request = $app->request()->getBody();
     $get = json_decode($request, true);
 
-    $category = new Category();
-    $category->code       = $get['code'];
-    $category->descriptor = $get['descriptor'];
-    $category->type       = $get['type'];
-    if(isset($id) && $id != NULL) {
-        $category->id = $id;
-    }
-    $category->save();
-    $category->type_name = $category->get_type_name(); 
-    unset($category->type);
-    
-    echo json_encode($category);
-}
+    $oTable = new $sTable();
 
-function addCategory() {
+    foreach ($get as $key => $value) {
 
-    $app = \Slim\Slim::getInstance();
-    //$database = MySQLDatabase::getInstance();
-
-    $request = $app->request()->getBody();
-    $get = json_decode($request, true);
-
-    $category = new Category();
-    $category->code       = $get['code'];
-    $category->descriptor = $get['descriptor'];
-    $category->type       = $get['type'];
-    if(isset($get['id']) && $get['id'] != NULL) {
-        $category->id = $get['id'];
-    }
+        if($key=="id") {
+            if(isset($value) &&  $value != NULL) {
+                $oTable->$key = $value;
+            }
+        } else {
+            $oTable->$key = $value;
+        }
+    }   
 
     $success = false;
-    $success = $category->save();
-    $category->type_name = $category->get_type_name(); 
-    unset($category->type);
+    $success = $oTable->save();
 
     if($success) {
-        echo json_encode($category);    
+
+        $vTable = substr_replace($sTable, 'x', 0, 0);
+        $ovTable = $vTable::find_by_id($oTable->id);
+     
+        echo json_encode($ovTable);    
+
     } else {
-       echo '{"error":" error on saving '.mysql_error().'"}';
+       $respone = array(
+            'status' => 'error', 
+            'code' => '404',
+            'message' => 'error on saving '.mysql_error()
+        );
+       echo json_encode($respone);
     }
+
+    /*
+    *  add record to a table but response with view table
+    */
     
 }
-
-
-function deleteCategory($id) {
-    //echo '{"respone":"success","id":"'.$id.'"}';
-    $category = new Category();
-    $category->id = $id;   
-    if($category->delete()) {
-        echo '{"id":"'.$id.'"}';
-    } else {
-        echo '{"error":1}';
-    }    
-}
-
-
-
-
-
-/**
-* Item table
-*/
-
-function addItem() {
-
-    $app = \Slim\Slim::getInstance();
-    //$database = MySQLDatabase::getInstance();
-
-    $request = $app->request()->getBody();
-    $get = json_decode($request, true);
-
-    $item = new Item();
-    $item->code       = $get['code'];
-    $item->descriptor = $get['descriptor'];
-    $item->type       = $get['type'];
-    $item->categoryid = $get['categoryid'];
-    $item->umeasure   = $get['umeasure'];
-    $item->longdesc   = $get['longdesc'];
-    $item->picfile    = $get['picfile'];
-    $item->onhand     = $get['onhand'];
-    $item->unitprice  = $get['unitprice'];
-    $item->floorprice = $get['floorprice'];
-    $item->unitcost   = $get['unitcost'];
-    if(isset($get['id']) && $get['id'] != NULL) {
-        $item->id = $get['id'];
-    }
-
-    $success = false;
-    $success = $item->save();
-    //$category->type_name = $category->get_type_name(); 
-    //unset($category->type);
-
-    if($success) {
-        echo json_encode($item);    
-    } else {
-       echo '{"error":" error on saving '.mysql_error().'"}';
-    }
-    
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -728,8 +787,10 @@ function datatables2($cTable) {
 
 
     $sql = "DESCRIBE ". $table;
-    #echo $sql ."<br>";
+    //echo $sql ."<br>";
     $rows = $database->query($sql);
+
+    //echo var_export($rows);
 
     $aColumns = array();
 
@@ -737,7 +798,7 @@ function datatables2($cTable) {
         $aColumns[] = $row[0];
     }
 
-    #print_r($aColumns);
+    //print_r($aColumns);
 
    // $key = array_search('id',  $aColumns); 
     #echo "<br>".$key."<br>";  
@@ -834,13 +895,15 @@ function datatables2($cTable) {
     $fsQuery = "SELECT SQL_CALC_FOUND_ROWS `".str_replace(" , ", " ", implode("`, `", $aColumns))."` FROM ". $table 
              ." $sWhere $sOrder $sLimit";
 
-    //echo $sQuery;
+    //echo $fsQuery;
     //$rResult =  $database->query($sQuery);
     $cTable = ucfirst($table);
 
     
 
     $oTable = $cTable::find_by_sql($fsQuery);
+
+    //echo json_encode($oTable);
 
     $sQuery = "SELECT FOUND_ROWS()";
     $result = $database->query($sQuery);
@@ -851,6 +914,7 @@ function datatables2($cTable) {
     $result = $database->query($sQuery);
     $row =  $database->fetch_row($result);
     $iTotal = intval($row[0]);
+
 
     #echo $iTotal;
 
@@ -1154,192 +1218,221 @@ function postingApvhdr($id){
 
     $apvhdr = Apvhdr::find_by_id($id);
 
+    //echo json_encode($apvhdr);
+    if(!$apvhdr->cancelled || $apvhdr->cancelled==0) {
 
-    if(!$apvhdr->posted || $apvhdr->posted==0) {
+        if(!$apvhdr->posted || $apvhdr->posted==0) {
 
-        $apvhdr_last = new Apvhdr();
-        $apvhdr_last->posted = 1;
-        $apvhdr_last->balance = $apvhdr->totamount - $apvhdr->totdebit + $apvhdr->totcredit;
-        $apvhdr_last->id = $id;
+            $apvhdr_last = new Apvhdr();
+            $apvhdr_last->posted = 1;
+            $apvhdr_last->balance = $apvhdr->totamount;
+            $apvhdr_last->id = $id;
 
-        //$apvhdr_last->lock_record();
-        
-        if(!$apvhdr_last->save()){
+            //$apvhdr_last->lock_record();
             
-            $database->rollback();
-            echo json_encode($apvhdr_last->result_respone(1,'1136'));
-            exit();
-        }
-
-        
-        $last_apledger = Apledger::get_last_record($apvhdr->supplierid);
-        $last_apledger_currbal = isset($last_apledger->currbal) ? $last_apledger->currbal:0;
-
-        
-        $apledger = new Apledger();
-        $apledger->supplierid   = $apvhdr->supplierid;
-        $apledger->txndate      = $apvhdr->date;
-        $apledger->txncode      = 'APV';
-        $apledger->txnrefno     = $apvhdr->refno;
-        $apledger->amount       = $apvhdr->totamount;
-        $apledger->prevbal      = $last_apledger_currbal;
-        $apledger->currbal      = $apledger->get_currbal();
-        
-        if(!$apledger->save()){
-        
-        /*        
-        $apledger = Apledger2::post('APV', $apvhdr->refno, $apvhdr->date, $apvhdr->totamount, $last_apledger_currbal, $apvhdr->supplierid);
-        if(!$apledger) { 
-        */   
-
-
-            $database->rollback();
-            echo json_encode($apledger->result_respone(1,'1156'));
-            exit();
-        }
-        
-        
-
-
-        $supplier = Supplier::find_by_id($apvhdr->supplierid);
-       
-        // $stu = supplier to be updated
-        $stu = new Supplier();
-        $stu->balance = $supplier->balance + $apledger->amount;
-        $stu->id = $apvhdr->supplierid;
-        
-        if($stu->lock_record()) {
-
-            if(!$stu->save()){
+            if(!$apvhdr_last->save()){
                 
-                /* commeted out
-                *       * unable to update the supplier
-                *       * no change on balace
-                *       * no item or the total amount of apv is 0
-                */
-
-                /*
-                $q = $database->last_query;
-                
-                $database->rollback(); 
-                echo json_encode($stu->result_respone(1,' Unable to post. No items/details found.'. $q ));
+                $database->rollback();
+                echo json_encode($apvhdr_last->result_respone(1,'1136'));
                 exit();
-                */
+            }
+        
 
+            /*************** start: update apledger ***********/
+            $last_apledger = Apledger::get_last_record($apvhdr->supplierid);
+            $last_apledger_currbal = isset($last_apledger->currbal) ? $last_apledger->currbal:0;
+           
+            $apledger = new Apledger();
+            $apledger->supplierid   = $apvhdr->supplierid;
+            $apledger->txndate      = $apvhdr->date;
+            $apledger->txncode      = 'APV';
+            $apledger->txnrefno     = $apvhdr->refno;
+            $apledger->amount       = $apvhdr->totamount;
+            $apledger->prevbal      = $last_apledger_currbal;
+            $apledger->currbal      = $apledger->get_currbal();
+            
+            if(!$apledger->save()){
+        
+            /*        
+            $apledger = Apledger2::post('APV', $apvhdr->refno, $apvhdr->date, $apvhdr->totamount, $last_apledger_currbal, $apvhdr->supplierid);
+            if(!$apledger) { 
+            */   
+
+
+                $database->rollback();
+                echo json_encode($apledger->result_respone(1,'1156'));
+                exit();
+            }
+            /*************** end: update apledger ***********/
+
+            /*************** start: update apledger ***********/
+            $last_apvledger = Apvledger::get_last_record($apvhdr->id);
+            $last_apvledger_currbal = isset($last_apvledger->currbal) ? $last_apvledger->currbal:0;
+           
+            $apvledger = new Apvledger();
+            $apvledger->apvhdrid     = $apvhdr->id;
+            $apvledger->txndate      = $apvhdr->date;
+            $apvledger->txncode      = 'APV';
+            $apvledger->txnrefno     = $apvhdr->refno;
+            $apvledger->amount       = $apvhdr->totamount;
+            $apvledger->prevbal      = $last_apvledger_currbal;
+            $apvledger->currbal      = $apvledger->get_currbal();
+            
+            if(!$apvledger->save()){
+
+
+                $database->rollback();
+                echo json_encode($apvledger->result_respone(1,'1156'));
+                exit();
+            }
+            /*************** end: update apledger ***********/
+        
+        
+
+
+            $supplier = Supplier::find_by_id($apvhdr->supplierid);   
+            // $stu = supplier to be updated
+            $stu = new Supplier();
+            $stu->balance = $supplier->balance + $apledger->amount;
+            $stu->id = $apvhdr->supplierid;
+            
+            if($stu->lock_record()) {
+
+                if(!$stu->save()){
+                    
+                    /* commeted out
+                    *       * unable to update the supplier
+                    *       * no change on balace
+                    *       * no item or the total amount of apv is 0
+                    */
+
+                    /*
+                    $q = $database->last_query;
+                    
+                    $database->rollback(); 
+                    echo json_encode($stu->result_respone(1,' Unable to post. No items/details found.'. $q ));
+                    exit();
+                    */
+
+                }
+            } else {
+                $database->rollback();
+                echo json_encode($stu->result_respone(2)); 
+                exit();
+            }
+
+            /*
+            $arItem = array();
+
+            $apvdtl_items = Apvdtl::find_all_by_field_id('apvhdr',$id);
+            if(!isset($apvdtl_items)) {
+                foreach ($apvdtl_items as $apv_items) {
+                    
+                    $item = Item::find_by_id($apv_items->itemid);  
+
+                    array_push($arItem, $item);
+                    
+                    if($item->is_product()){
+
+                        // $itu = item to be updated
+                        $itu = new Item();
+                        $itu->onhand = $item->onhand + $apv_items->qty;
+                        $itu->unitcost = $apv_items->unitcost;
+                        $itu->id = $item->id;
+
+                        if($itu->lock_record()) {
+
+                            if(!$itu->save()){
+                                
+                                $database->rollback(); 
+                                echo json_encode($itu->result_respone(1,'no item to save'. $item->id)); 
+                                exit();
+                            }
+                        } else {
+
+                            $database->rollback();
+                            echo json_encode($itu->result_respone(2,'unable to lock item '. $itu->id));  
+                            exit();
+                        }
+
+
+                        $last_stockcard = Stockcard::get_last_record($item->id);
+                        $last_stockcard_currbal = isset($last_stockcard->currbal)  ? $last_stockcard->currbal:0;
+                        //$last_stockcard->currbal = $item->onhand;
+
+                        $stockcard = new Stockcard();
+                        $stockcard->itemid      = $item->id;
+                        $stockcard->locationid  = $apvhdr->locationid;
+                        $stockcard->txndate     = $apvhdr->date;
+                        $stockcard->txncode     = 'APV';
+                        $stockcard->txnrefno    = $apvhdr->refno;
+                        $stockcard->qty         = $apv_items->qty;
+                        $stockcard->prevbal     = $last_stockcard_currbal;
+                        $stockcard->currbal     = $stockcard->get_currbal();
+                        //$stockcard->prevbalx    =;
+                        //$stockcard->currbalx    =;
+
+                        if($stockcard->lock_record()){
+
+                            if(!$stockcard->save()){
+                                
+                                $database->rollback(); 
+                                echo json_encode($stockcard->result_respone(1,'1240')); 
+                                exit();
+                            }
+                        } else {
+                             
+                            $database->rollback();
+                            echo json_encode($stockcard->result_respone(2)); 
+                            exit();
+                        }
+                    } // end is product
+                } // end foreach item
+            } else {
+                // no items/details on this apv
+                // just continue the transaction
+            }
+            */
+
+        
+            //$database->rollback();
+            if($database->commit()){
+                
+                $respone = array(
+                    'status' => 'success', 
+                    'code' => '200',
+                    'message' => 'Success on posting: '. $apvhdr->refno ,
+                    'data' => array(
+                        'apvhdr' => $apvhdr_last 
+                    )
+                );
+            } else {
+                $database->rollback();
+
+                $respone = array(
+                    'status' => 'error', 
+                    'code' => '404',
+                    'message' => 'error on commtting the transactions',
+                    'data' => array(
+                        'apvhdr' => $apvhdr_last
+                    )
+                );
             }
         } else {
 
             $database->rollback();
-            echo json_encode($stu->result_respone(2)); 
-            exit();
-        }
-
-        $arItem = array();
-
-        $apvdtl_items = Apvdtl::find_all_by_field_id('apvhdr',$id);
-        if(!isset($apvdtl_items)) {
-            foreach ($apvdtl_items as $apv_items) {
-                
-                $item = Item::find_by_id($apv_items->itemid);  
-
-                array_push($arItem, $item);
-                
-                if($item->is_product()){
-
-                    // $itu = item to be updated
-                    $itu = new Item();
-                    $itu->onhand = $item->onhand + $apv_items->qty;
-                    $itu->unitcost = $apv_items->unitcost;
-                    $itu->id = $item->id;
-
-                    if($itu->lock_record()) {
-
-                        if(!$itu->save()){
-                            
-                            $database->rollback(); 
-                            echo json_encode($itu->result_respone(1,'no item to save'. $item->id)); 
-                            exit();
-                        }
-                    } else {
-
-                        $database->rollback();
-                        echo json_encode($itu->result_respone(2,'unable to lock item '. $itu->id));  
-                        exit();
-                    }
-
-
-                    $last_stockcard = Stockcard::get_last_record($item->id);
-                    $last_stockcard_currbal = isset($last_stockcard->currbal)  ? $last_stockcard->currbal:0;
-                    //$last_stockcard->currbal = $item->onhand;
-
-                    $stockcard = new Stockcard();
-                    $stockcard->itemid      = $item->id;
-                    $stockcard->locationid  = $apvhdr->locationid;
-                    $stockcard->txndate     = $apvhdr->date;
-                    $stockcard->txncode     = 'APV';
-                    $stockcard->txnrefno    = $apvhdr->refno;
-                    $stockcard->qty         = $apv_items->qty;
-                    $stockcard->prevbal     = $last_stockcard_currbal;
-                    $stockcard->currbal     = $stockcard->get_currbal();
-                    //$stockcard->prevbalx    =;
-                    //$stockcard->currbalx    =;
-
-                    if($stockcard->lock_record()){
-
-                        if(!$stockcard->save()){
-                            
-                            $database->rollback(); 
-                            echo json_encode($stockcard->result_respone(1,'1240')); 
-                            exit();
-                        }
-                    } else {
-                         
-                        $database->rollback();
-                        echo json_encode($stockcard->result_respone(2)); 
-                        exit();
-                    }
-                } // end is product
-            } // end foreach item
-        } else {
-            // no items/details on this apv
-            // just continue the transaction
-        }
-
-        
-        //$database->rollback();
-        if($database->commit()){
-            
             $respone = array(
-                'status' => 'success', 
-                'code' => '200',
-                'message' => 'success on posting',
-                'data' => array(
-                    'apvhdr' => $apvhdr_last,
-                    'item' => $arItem
-                )
-            );
-        } else {
-            $database->rollback();
-
-              $respone = array(
                 'status' => 'error', 
-                'code' => '404',
-                'message' => 'error on commtting the transactions',
-                'data' => array(
-                    'apvhdr' => $apvhdr_last
-                )
+                'code' => '411',
+                'message' => 'apvhdr '. $apvhdr->refno .' is already posted'
             );
-
         }
-       
-
     } else {
-
         $database->rollback();
         $respone = array(
-            'status' => 'error', 
-            'code' => '404',
-            'message' => 'apvhdr '. $id .' is already posted'
+                'status' => 'error', 
+                'code' => '412',
+                'message' => 'apvhdr '. $apvhdr->refno .' is cancelled. Cannot be posted.'
         );
     }
 
@@ -1392,6 +1485,47 @@ function postingCancelledApvhdr($id){
     echo json_encode($respone); 
 }
 
+
+function getPostedDetail($table, $fld) {
+
+    $app = \Slim\Slim::getInstance();
+    $sTable = ucfirst($table);
+
+    $request = $app->request();
+    //$get = json_decode($request, true);
+
+
+
+    $oTable = $sTable::find_all_posted($field=$fld, $id=$request->get('id'), $posted=true);
+
+    echo json_encode($oTable); 
+}
+
+
+function searchTxnViewTable($table, $supplierid) {
+
+    $app = \Slim\Slim::getInstance();
+    $database = MySQLDatabase::getInstance();
+
+    $request = $app->request();
+
+    $q = $database->escape_value($request->get('q'));
+    $maxRows = $database->escape_value($request->get('maxRows'));
+    $maxRows = isset($maxRows) ? $maxRows : 25;
+
+    //$sTable = ucfirst($table);
+    $vTable = substr_replace($table, 'v', 0, 0);
+    //$ovTable = $vTable::find_by_id($oTable->id);
+
+    $sql = "SELECT * FROM ". $table ." WHERE `refno` LIKE '%". $q ."%' AND posted = 1 AND cancelled = 0 AND balance > 0 AND supplierid = '". $supplierid ."' ORDER BY date DESC LIMIT 0, ". $maxRows; 
+
+    //$sTable = ucfirst($table);
+    
+    $oTable = $vTable::find_by_sql($sql);
+
+
+    echo json_encode( $oTable );
+}
 
 
 

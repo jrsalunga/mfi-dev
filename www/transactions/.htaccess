@@ -1,0 +1,15 @@
+RewriteEngine on
+
+
+
+RewriteRule ^apvhdr(\/.*)*$ /transactions/apvhdr.php
+RewriteRule ^apvhdr2(\/.*)*$ /transactions/apvhdr2.php
+RewriteRule ^accounts-payable-print(\/.*)*$ /transactions/accounts-payable-print.php
+RewriteRule ^check(\/.*)*$ /transactions/check.php
+RewriteRule ^check2(\/.*)*$ /transactions/check2.php
+RewriteRule ^check-print(\/.*)*$ /transactions/check-print.php
+
+
+
+
+

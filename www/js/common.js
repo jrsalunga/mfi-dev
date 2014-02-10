@@ -28,7 +28,7 @@ $(document).ready(function() {
 	
 	$(".table-model input[type=checkbox].toggle").on('click', function(){
 		
-		//console.log($(this).data('input'));
+		console.log($(this).data('input'));
 		var i = $(this).data('input');
 		
 		if($(this).attr('checked')){
@@ -436,6 +436,256 @@ function addTableData(data,oTable) {
 		
 }
 
+function addTableData2(data) {
+	   
+	clear_alert();
+	
+	if(!data.error) {
+		
+		var fr = $(".tb-data tbody tr:first-of-type");
+		var sr = $(".tb-data tbody tr:nth-of-type(2)");
+		var lr = $(".tb-data tbody tr:last-of-type");
+	 	var no = parseInt($(".tb-data tbody tr:last-of-type td:first-of-type").text());
+	    //var ctr = no + 1;
+		var ctr = lr.index();
+
+		var a = '';
+			a += '<div class="tb-data-action">';
+			//a += '<a href="#" class="row-post">&nbsp;</a>';
+			a += '<a href="#" class="row-delete" >&nbsp</a>';
+			//a += '<a href="#" data-id="fasdfas" data-toggle="modal" data-target="#mdl-frm-detail">edit</a>'
+			a += '<a href="#" class="row-edit" >&nbsp</a>';
+			//a += '<a href="#" class="row-view" ></a>';
+			//	a += '<a href="#" data-id="'+ detailid +'" class="row-view" >view</a>'
+			a += '</div>';
+	  
+	  	
+	  
+		var key, len = 0, row = '';
+		for(key in data) {
+			if(len == 0 ) {
+				//row += '<tr id="'+ data[key] +'" data-id="'+ data[key] +'"><td>'+ ctr +'</td>';
+				row += '<tr class="even" id="'+ data[key] +'" data-id="'+ data[key] +'">';
+			} else if(len == 1){
+				var i = len - 1;
+				var cls = $("td:eq("+ i +")" ,sr).attr('class');
+				console.log(sr);
+				row += '<td>'+ data[key] + a +'</td>';
+			} else if(key.substr(key.length - 2) === 'id' ){
+				//var opt = $(".table-model").find('#'+key+' option[value='+data[key]+']').text();
+				//row += '<td>'+ opt +'</td>';
+				len--;
+			} else {
+				var i = len - 1;	
+				var cls = $("td:eq("+ i +")" ,sr).attr('class');
+				var x;
+				//console.log(cls);
+
+
+				if(cls==='currency'){
+					x = toCurrency(data[key]);
+				} else if(cls==='number'){
+					x = data[key];
+				} else if(cls==='posted'){
+					x = '✖';
+				} else {
+					x = data[key];
+				}
+
+
+				row += '<td class="'+ cls +'">'+ x +'</td>';
+			}
+		  //console.log(data[key]);
+		  //console.log(key);
+		  len++;
+		}
+		
+		
+		//row += '<td>';
+		//row += '<a class="edit" data-id="'+  data.id +'" data-table="category" href="#">Edit</a> ';
+		//row += '<a class="delete" data-id="'+ data.id +'" data-table="category" href="#">Delete</a>';
+		//row += '</td></tr>';
+		row += '</tr>';
+		//alert(len);
+		
+		/*    
+		row += '<tr id="'+ data.id +'" ><td>'+ ctr +'</td>';
+	    row += '<td>'+ data.code +'</td>';
+	    row += '<td>'+ data.descriptor +'</td>';
+		row += '<td>'+ data.type_name +'</td>';
+	    row += '<td>';
+		row += '<a class="edit" data-id="'+  data.id +'" data-table="category" href="#">Edit</a> ';
+		row += '<a class="delete" data-id="'+ data.id +'" data-table="category" href="#">Delete</a>';
+		row += '</td></tr>';			
+		*/		
+				
+	   	fr.before(row);
+		
+		if(lr.index() == 10 || 
+		   lr.index() == 25 ||
+		   lr.index() == 50 ||
+		   lr.index() == 100) {
+		   lr.remove();
+		}
+		
+		//lr.next().css('border','red 1px solid');
+		fr.prev().find('td').each(function() {
+			// color animation, optional. Do whatever you like here.
+			//alert('fsafas');
+			
+			//fade 1
+			/*
+			$(this).animate({
+			fontSize: "2em", backgroundColor: "#D5F9D5"
+			}, 500 ).animate({
+			fontSize: "1em"
+			}, 500 );
+			*/
+			//fade 2
+			$(this).effect("highlight", {}, 3000);
+		
+		});
+		
+		update_showing_entries();	   
+	 	set_alert('success','Well done!', 'You successfully saved');
+			
+	} else {
+		//console.log(data.error);	
+		
+		set_alert('error','Oh snap!',data.error);	
+	}
+	
+	
+
+
+}
+
+function addTableData3(data) {
+	   
+	clear_alert();
+	
+	if(!data.error) {
+		
+		var fr = $(".tb-data tbody tr:first-of-type");
+		var sr = $(".tb-data tbody tr:nth-of-type(2)");
+		var lr = $(".tb-data tbody tr:last-of-type");
+	 	var no = parseInt($(".tb-data tbody tr:last-of-type td:first-of-type").text());
+	    //var ctr = no + 1;
+		var ctr = lr.index();
+
+		var a = '';
+			a += '<div class="tb-data-action">';
+			a += '<a href="#" class="row-post">&nbsp;</a>';
+			a += '<a href="#" class="row-delete" >&nbsp</a>';
+			//a += '<a href="#" data-id="fasdfas" data-toggle="modal" data-target="#mdl-frm-detail">edit</a>'
+			a += '<a href="#" class="row-edit" >&nbsp</a>';
+			a += '<a href="#" class="row-view" ></a>';
+			//	a += '<a href="#" data-id="'+ detailid +'" class="row-view" >view</a>'
+			a += '</div>';
+	  
+	  	
+	  
+		var key, len = 0, row = '';
+		for(key in data) {
+			if(len == 0 ) {
+				//row += '<tr id="'+ data[key] +'" data-id="'+ data[key] +'"><td>'+ ctr +'</td>';
+				row += '<tr class="even" id="'+ data[key] +'" data-id="'+ data[key] +'">';
+			} else if(len == 1){
+				var i = len - 1;
+				var cls = $("td:eq("+ i +")" ,sr).attr('class');
+				//console.log(sr);
+				row += '<td>'+ data[key] + a +'</td>';
+			} else if(key.substr(key.length - 2) === 'id' ){
+				//var opt = $(".table-model").find('#'+key+' option[value='+data[key]+']').text();
+				//row += '<td>'+ opt +'</td>';
+				len--;
+			} else {
+				var i = len - 1;	
+				var cls = $("td:eq("+ i +")" ,sr).attr('class');
+				var x;
+				//console.log(cls);
+
+
+				if(cls==='currency'){
+					x = toCurrency(data[key]);
+				} else if(cls==='number'){
+					x = data[key];
+				} else if(cls==='posted'){
+					x = '✖';
+				} else {
+					x = data[key];
+				}
+
+
+				row += '<td class="'+ cls +'">'+ x +'</td>';
+			}
+		  //console.log(data[key]);
+		  //console.log(key);
+		  len++;
+		}
+		
+		
+		//row += '<td>';
+		//row += '<a class="edit" data-id="'+  data.id +'" data-table="category" href="#">Edit</a> ';
+		//row += '<a class="delete" data-id="'+ data.id +'" data-table="category" href="#">Delete</a>';
+		//row += '</td></tr>';
+		row += '</tr>';
+		//alert(len);
+		
+		/*    
+		row += '<tr id="'+ data.id +'" ><td>'+ ctr +'</td>';
+	    row += '<td>'+ data.code +'</td>';
+	    row += '<td>'+ data.descriptor +'</td>';
+		row += '<td>'+ data.type_name +'</td>';
+	    row += '<td>';
+		row += '<a class="edit" data-id="'+  data.id +'" data-table="category" href="#">Edit</a> ';
+		row += '<a class="delete" data-id="'+ data.id +'" data-table="category" href="#">Delete</a>';
+		row += '</td></tr>';			
+		*/		
+				
+	   	fr.before(row);
+		
+		if(lr.index() == 10 || 
+		   lr.index() == 25 ||
+		   lr.index() == 50 ||
+		   lr.index() == 100) {
+		   lr.remove();
+		}
+		
+		//lr.next().css('border','red 1px solid');
+		fr.prev().find('td').each(function() {
+			// color animation, optional. Do whatever you like here.
+			//alert('fsafas');
+			
+			//fade 1
+			/*
+			$(this).animate({
+			fontSize: "2em", backgroundColor: "#D5F9D5"
+			}, 500 ).animate({
+			fontSize: "1em"
+			}, 500 );
+			*/
+			//fade 2
+			$(this).effect("highlight", {}, 3000);
+		
+		});
+		
+		update_showing_entries();	   
+	 	set_alert('success','Well done!', 'You successfully saved');
+			
+	} else {
+		//console.log(data.error);	
+		
+		set_alert('error','Oh snap!',data.error);	
+	}
+	
+	
+
+
+}
+
+
+
 
 	
 
@@ -643,11 +893,17 @@ function set_alert(type, header, text) {
 		alert_row += '<strong>'+ header +' </strong>' + text;
 		alert_row += '</div>';
 	
-	$('#frm-alert').html(alert_row);
+
+	if($('#frm-alert').length == '0'){
+		$('.form-alert').html(alert_row);
+	} else {
+		$('#frm-alert').html(alert_row);
+	}
 }
 
 function clear_alert() {
 	$('#frm-alert').html('');
+	$('.form-alert').html('');
 }
 
 function update_showing_entries() {
@@ -702,8 +958,7 @@ $.fn.serializeObject = function()
 };
 
 // if value is blank, it does not include
-$.fn.serializeObject2 = function()
-{
+$.fn.serializeObject2 = function() {
     var o = {};
 
     //$('input[type=number]', this).each(function(){ // select all the element in form
@@ -716,27 +971,38 @@ $.fn.serializeObject2 = function()
 
 
     $.each(a, function() {
+
         if (o[this.name] !== undefined) {
+        	console.log('pasok sa una');
             if (!o[this.name].push) {
                 o[this.name] = [o[this.name]];
             }
             o[this.name].push(this.value || '');
         } else if(this.value==""){
+        	// of no value
         	// do nothing
+       // } else if(this.name === 'date'){
+       // 	console.log('may date');
+        	
         } else {
 
         	if(this.name == "qty"){
+
         		o[this.name] = parseInt(this.value) || 0;
         	} else if(
         		this.name == "unitcost" || 
-        		this.name == "amount"
+        		this.name == "amount" ||
+        		this.name == "totamount"
         		){
-        		o[this.name] = parseFloat(this.value) || 0;
+        		
+        		o[this.name] = accounting.toFixed(this.value,2) || 0;
+        		
         	} else {
-        		o[this.name] = this.value || '';	
+        		o[this.name] = stripHTML(this.value) || '';	
         	}        
         }
     });
+    //console.log(o);
     return o;
 };
 
@@ -957,6 +1223,16 @@ function toCurrency(data) {
 
 
 
+Date.prototype.currentIsoDate = function() {
+      var currentDate = new Date()
+      var day = currentDate.getDate()
+      var month = currentDate.getMonth() + 1
+      var year = currentDate.getFullYear()
+	  return year+'-'+month+'-'+day;
+}
+
+
+
 /**********************************************************************************************************************/
 /************************* flat table v2 stuff ****************************************************************************/
 /**********************************************************************************************************************/
@@ -1058,46 +1334,106 @@ function updateTableData2(data) {
 			if(len == 0) {
 				
 			} else {	
-				//console.log($(existing_tr +' td').index());
-				//console.log(data[key]+' '+len);
 				var i = len - 1;
 
 				$('td:eq('+ i +')', existing_tr).text(data[key]);
 				if($('td:eq('+ i +')', existing_tr).hasClass('currency')){
 					$('td:eq('+ i +')', existing_tr).toCurrency();
-				}
-				
-				/*
-				existing_tr.find('td')
-                    .filter(function(index){
-						console.log(len);
-						return index == len
-				    })
-					.text(data[key]);
-				*/			
+				}	
 			}
 			len++;		
 		}
 
 		existing_tr.find('td')
 				   .effect("highlight", {}, 3000);
+}
+
+function updateTableData3(data) {
+	var existing_tr =  $(".tb-data tbody tr#"+ data.id);
+		//existing_tr.css('border','red 1px solid');
 		
-		/*
-		existing_tr.find('td:not(:last-of-type)').each(function(){
-						var key, len = 0;
-						for(key in data) {
-							if(len == 0) {
-								
-							} else {	
-								$(this).text(data[key]);
-							}
-							 len++;
-						}	
-					})				  
-				   .parent()
-				   .find('td')
+		var key, len = 0;
+		var a = '';
+			a += '<div class="tb-data-action">';
+			//a += '<a href="#" class="row-post">&nbsp;</a>';
+			a += '<a href="#" class="row-delete" >&nbsp;</a>';
+			//a += '<a href="#" data-id="fasdfas" data-toggle="modal" data-target="#mdl-frm-detail">edit</a>'
+			a += '<a href="#" class="row-edit" >&nbsp;</a>';
+			//a += '<a href="#" class="row-view" ></a>';
+			//	a += '<a href="#" data-id="'+ detailid +'" class="row-view" >view</a>'
+			a += '</div>';
+
+		for(key in data) {
+			//console.log(key +'-'+ data[key]);
+			if(len == 0) {
+				
+			} else if(len == 1) {
+				//console.log(len +' - '+ data[key]);
+				//console.log($('td:eq(1)', existing_tr));
+				$('td:first-of-type', existing_tr).html(data[key] + a);
+			} else if(key.substr(key.length - 2) === 'id' ){
+				len--;
+			} else {	
+				var i = len - 1;
+				
+				$('td:eq('+ i +')', existing_tr).text(data[key]);
+				if($('td:eq('+ i +')', existing_tr).hasClass('currency')){
+					//console.log($('td:eq('+ len +')', existing_tr));
+					$('td:eq('+ i +')', existing_tr).toCurrency();
+				} 
+
+
+			}
+			len++;		
+		}
+
+		existing_tr.find('td')
 				   .effect("highlight", {}, 3000);
-				   */
+}
+
+function updateTableData4(data) {
+	var existing_tr =  $(".tb-data tbody tr#"+ data.id);
+		//existing_tr.css('border','red 1px solid');
+		
+		var key, len = 0;
+		var a = '';
+			a += '<div class="tb-data-action">';
+			a += '<a href="#" class="row-post">&nbsp;</a>';
+			a += '<a href="#" class="row-delete" >&nbsp;</a>';
+			//a += '<a href="#" data-id="fasdfas" data-toggle="modal" data-target="#mdl-frm-detail">edit</a>'
+			a += '<a href="#" class="row-edit" >&nbsp;</a>';
+			a += '<a href="#" class="row-view" ></a>';
+			//	a += '<a href="#" data-id="'+ detailid +'" class="row-view" >view</a>'
+			a += '</div>';
+
+		for(key in data) {
+			//console.log(key +'-'+ data[key]);
+			if(len == 0) {
+				
+			} else if(len == 1) {
+				//console.log(len +' - '+ data[key]);
+				//console.log($('td:eq(1)', existing_tr));
+				$('td:first-of-type', existing_tr).html(data[key] + a);
+			} else if(key.substr(key.length - 2) === 'id' ){
+				len--;
+			} else {	
+				var i = len - 1;
+				
+				$('td:eq('+ i +')', existing_tr).text(data[key]);
+				if($('td:eq('+ i +')', existing_tr).hasClass('currency')){
+					//console.log($('td:eq('+ len +')', existing_tr));
+					$('td:eq('+ i +')', existing_tr).toCurrency();
+				} else if($('td:eq('+ i +')', existing_tr).hasClass('posted')){
+					$('td:eq('+ i +')', existing_tr).text('✖');
+				}
+
+
+			}
+			len++;		
+		}
+
+		existing_tr.find('td')
+				   .effect("highlight", {}, 3000);
 }
 
 
@@ -1477,6 +1813,8 @@ function stripHTML(x) {
 	}
 	
 }
+
+
 
 
 

@@ -15,6 +15,15 @@ class Matcat extends DatabaseObject{
 	public $code;
 	public $descriptor;
 	
-	
+
+	public static function find_all($order=NULL) {
+		if(empty($order) || $order==NULL) {
+			return parent::find_by_sql("SELECT * FROM ".static::$table_name. " ORDER BY descriptor ASC");
+		} else {
+			return parent::find_by_sql("SELECT * FROM ".static::$table_name." ".$order);
+		}
+  	}
 }
+
+
 

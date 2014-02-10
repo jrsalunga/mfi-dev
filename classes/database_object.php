@@ -11,6 +11,7 @@ class DatabaseObject {
 	
 	protected static $table_name="category";
 	protected static $db_fields = array('id', 'code', 'descriptor', 'type');
+	protected static $parent_table = array('apvhdr');
 
 	
 	public static function find_all($order=NULL) {
@@ -85,6 +86,30 @@ class DatabaseObject {
 		$row = $database->fetch_array($result_set);
 	
 		return !empty($row) ? $row["$col"] : false;	
+	}
+	
+	public static function getLastNumber(){
+		global $database;
+		
+		#$table = static::$table_name;
+		
+		$database->startTransaction();
+		$sql = "SELECT * FROM autoinc WHERE tableid = '". static::$table_name ."' FOR UPDATE";
+		$result_set = $database->query($sql);
+		$rows = $database->fetch_array($result_set);
+		
+		if($database->affected_rows()==1){
+			$nLastNumber = $rows[1] + 1;
+			$sql = "UPDATE autoinc SET lastnumber = ". $nLastNumber ." WHERE tableid = '". static::$table_name ."'";
+			$result_set = $database->query($sql);
+			$database->commit();
+			return $nLastNumber;
+			exit();
+		} else {
+			$database->rollback();
+			return false;
+			exit();
+		}
 	}
 
 	private static function instantiate($record) {
@@ -241,6 +266,24 @@ class DatabaseObject {
 		//return true;
 	
 	}
+	
+	public static function find_all_posted($field=0,$id=0,$posted=true) {
+		
+		if(false !== array_search('posted', static::$db_fields)) {
+		
+			if($posted) {
+				$sql = "SELECT * FROM ". static::$table_name ." WHERE {$field}id='{$id}' AND posted = 1 AND cancelled = 0 AND balance > 0";
+				
+				$result_array = static::find_by_sql($sql);
+				return !empty($result_array) ? $result_array : false;
+			} else {
+				$result_array = static::find_by_sql("SELECT * FROM ". static::$table_name ." WHERE {$field}id='{$id}' AND posted = 0 AND cancelled = 0 AND balance > 0");
+				return !empty($result_array) ? $result_array : false;
+			}
+		} else {
+			return false;	
+		}
+  	}
 	
 	public function result_respone($no=NULL, $msg=NULL){
 		global $database;
